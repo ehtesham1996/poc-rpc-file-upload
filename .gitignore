@@ -1,0 +1,7 @@
+node_modules
+store
+drives/*
+files/*
+store/*
+
+package-lock.json
