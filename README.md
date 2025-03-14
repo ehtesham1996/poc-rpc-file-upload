@@ -30,72 +30,7 @@ node {approach}/client.js <filePath>
 ```
 specify the file path to be sent to the server
 
-## Approach 1 CENC Encoder
-
-The client read file convert it to json with key and path along data and then encodes it and send over rpc
-The server decodes the data and writes it to hyperDrive/Local
-
-### Findings
-- The file size is limited to 4MB
-- For file size 1024 MB - 64 MB of memory it give javacsript heap out of memory error
-- For file size 32 MB - 5MB it says channel closed but works fine when given 3MB file size
-- For 3MB - 1MB it works fine
-
-### Advantages
-- Easy to implement
-- Direct RPC Call
-
-### Disadvantages
-- File size is limited to 4MB
-
-## Approach 2 Base64
-
-The client read file convert it to base64 along with path and key and send it over rpc
-The server decodes the data and writes it to hyperDrive/Local
-
-### Findings
-- The file size is limited to 10MB
-- For file size 1024 MB - 64 MB of memory it give javacsript heap out of memory error
-- For file size 32 MB - 5MB it says channel closed but works fine when given 10MB file size
-- For 10MB - 1MB it works fine
-
-### Advantages
-- Easy to implement
-- Direct RPC Call
-- Native Library used no need to encode and decode
-
-### Disadvantages
-- File size is limited to 10MB
-- Large Data sent over rpc is not reliable
-
-
-## Approach 3 Http
-
-The client passes the http or hyperDrive url to the server and server downloads the file
-The server writes the file to hyperDrive/Local
-
-For running client use the following command
-
-```bash
-node approach-3-http/client.js https://file-examples.com/storage/fef4c7c51867d2ced974d7e/2017/10/file-example_PDF_1MB.pdf
-```
-
-### Findings
-- No limit on file size as the file is downloaded from the server
-- Works fine for all file sizes
-
-### Advantages
-- No limit on file size
-- Would be helpful in chain of rpc calls
-
-### Disadvantages
-- Need to have a server to download the file
-- Need to have a public url to download the file
-- File has to be uploaded to server before sending
-- Need to implement relevant dataLoader from BaseDL
-
-
-## Approach 4 Chunking
+## Approach 1 Chunking CENC
 
 The client reads the file make a init call with metadata of file and sends it in chunks to the server
 The server writes the file to hyperDrive/Local
@@ -112,6 +47,50 @@ The server writes the file to hyperDrive/Local
 - No need to have a server to download the file
 - No need to have a public url to download the file
 
-
 ### Disadvantages
 - Need to check how does this would work in our case with multiple rpc chaining calls
+
+## Approach 2 Hyperswarm
+
+The client initiates a transfer via RPC, then uses Hyperswarm for direct peer-to-peer file streaming
+The server creates a writable stream to hyperDrive/Local and handles the incoming data stream
+
+### Findings
+- Works well for large files
+- Direct P2P connection reduces server load
+- Reliable streaming of data
+
+### Advantages
+- Efficient P2P file transfer
+- Good for large files
+- Streaming approach means low memory usage
+- Built-in network resilience
+
+### Disadvantages
+- More complex setup
+- Requires P2P networking setup
+- Initial connection establishment takes time
+
+## Approach 3 HTTP Multipart
+
+The client uploads the file using HTTP multipart form data
+The server handles the upload stream and writes to hyperDrive/Local
+
+### Findings
+- Works well for files up to configured size limit
+- Familiar HTTP-based approach
+- Good progress tracking
+
+### Advantages
+- Simple and standard approach
+- Easy to implement
+- Works with existing web infrastructure
+- Good browser compatibility
+
+### Disadvantages
+- Requires HTTP server setup
+- Limited by HTTP server configurations
+- Not as efficient as P2P approaches in terms of streaming but faster as compared to them
+
+
+

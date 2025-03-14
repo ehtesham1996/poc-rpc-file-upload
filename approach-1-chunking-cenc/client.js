@@ -6,10 +6,12 @@ const CoreStore = require('corestore')
 const Hyperbee = require('hyperbee')
 const crypto = require('crypto')
 const DHT = require('hyperdht')
-const { argv } = require('process')
+const { argv } = require('process');
+const cenc = require('compact-encoding');
+const path = require('path');
 
 const serverKey = 'eb090c4b3e8358b56462ee9339b5bf2efa0750fa8f9fe2d4001f20d3db436bff'
-const CHUNK_SIZE = 1024 * 1024 // 1MB chunks
+const CHUNK_SIZE = 1024 * 1024 * 4 // 4MB chunks
 
 const FILE = argv[2]
 
@@ -30,10 +32,15 @@ async function* generateChunks(filePath, chunkSize) {
   await fileHandle.close()
 }
 
+async function getFileSize(filePath) {
+  const stats = await fs.promises.stat(filePath)
+  return stats.size
+}
+
 const main = async () => {
   try {
-    const coreStore = new CoreStore('./store/approach-4-client')
-    const hcore = coreStore.get({ name: 'approach-4' })
+    const coreStore = new CoreStore('./store/approach-1-client')
+    const hcore = coreStore.get({ name: 'approach-1' })
 
     const hbee = new Hyperbee(hcore, { keyEncoding: 'utf-8', valueEncoding: 'binary' })
     let dhtSeed = (await hbee.get('dht-seed'))?.value
@@ -52,12 +59,18 @@ const main = async () => {
     const rpc = new RPC({ dht })
     const client = rpc.connect(Buffer.from(serverKey, 'hex'))
 
-    const stats = await fs.promises.stat(FILE)
-    const totalChunks = Math.ceil(stats.size / CHUNK_SIZE)
+    const fileName = path.basename(FILE)
+    const fileSize = await getFileSize(FILE)
+    const fileSizeMB = fileSize / (1024 * 1024)
+    const totalChunks = Math.ceil(fileSize / CHUNK_SIZE)
+    let bytesUploaded = 0
+
+    console.log(`Starting upload of ${fileName} (${fileSizeMB.toFixed(2)} MB)`)
+    const startTime = Date.now()
 
     // Initialize upload
     const initRes = await client.request('initUpload', Buffer.from(JSON.stringify({
-      path: '/test.mov',
+      path: '/mov.mov',
       totalChunks
     })))
     const { uploadId } = JSON.parse(initRes.toString())
@@ -65,18 +78,34 @@ const main = async () => {
     // Upload chunks
     let chunkIndex = 0
     for await (const chunk of generateChunks(FILE, CHUNK_SIZE)) {
-      const res = await client.request('uploadChunk', Buffer.from(JSON.stringify({
+      const reqJson = {
         uploadId,
         chunkIndex,
-        data: chunk.data.toString('base64')
-      })))
+        data: chunk.data
+      }
+
+      const encodedBuffer = cenc.encode(cenc.json, reqJson)
+      const res = await client.request('uploadChunk', encodedBuffer)
       
-      const result = JSON.parse(res.toString())
+      const result = cenc.decode(cenc.json, res)
       if (!result.success) throw new Error('Chunk upload failed')
       
-      console.log(`Uploaded chunk ${chunkIndex + 1}/${totalChunks} (${Math.round((chunkIndex + 1) / totalChunks * 100)}%)`)
+      bytesUploaded += chunk.data.length
+      const progress = (bytesUploaded / fileSize * 100).toFixed(2)
+      const uploadedMB = (bytesUploaded / (1024 * 1024)).toFixed(2)
+      process.stdout.write(`\rProgress: ${progress}% (${uploadedMB}MB/${fileSizeMB.toFixed(2)}MB)`)
+
       chunkIndex++
     }
+
+    const endTime = Date.now()
+    const timeTaken = (endTime - startTime) / 1000
+    const speedMBps = fileSizeMB / timeTaken
+
+    console.log(`\nUpload Statistics:
+    File Size: ${fileSizeMB.toFixed(2)} MB
+    Time Taken: ${timeTaken.toFixed(2)} seconds
+    Average Speed: ${speedMBps.toFixed(2)} MB/s`)
 
     await rpc.destroy()
     process.exit(0)

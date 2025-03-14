@@ -7,10 +7,11 @@ const crypto = require('crypto')
 const CoreStore = require('corestore')
 const goodBye = require('graceful-goodbye')
 const Localdrive = require('localdrive')
+const cenc = require('compact-encoding');
 
 async function main() {
-  const coreStore = new CoreStore('./store/approach-4-server')
-  const core = coreStore.get({ name: 'approach-4' })
+  const coreStore = new CoreStore('./store/approach-1-server')
+  const core = coreStore.get({ name: 'approach-1' })
 
   const hbee = new Hyperbee(core, { keyEncoding: 'utf-8', valueEncoding: 'binary' })
   await hbee.ready()
@@ -49,39 +50,52 @@ async function main() {
     await coreStore.close()
   })
 
-  const drive = new Localdrive('./drives/approach-4')
+  const drive = new Localdrive('./drives/approach-1')
   const activeUploads = new Map()
 
   rpcServer.respond('initUpload', async (reqRaw) => {
     const { path, totalChunks } = JSON.parse(reqRaw.toString())
     const uploadId = crypto.randomBytes(16).toString('hex')
     const writeStream = drive.createWriteStream(path)
-    
+
     activeUploads.set(uploadId, {
       path,
       writeStream,
       totalChunks,
-      receivedChunks: 0
+      receivedChunks: 0,
+      bytesReceived: 0,
+      startTime: Date.now()
     })
     return Buffer.from(JSON.stringify({ uploadId }))
   })
 
   rpcServer.respond('uploadChunk', async (reqRaw) => {
-    const { uploadId, chunkIndex, data } = JSON.parse(reqRaw.toString())
+    const { uploadId, chunkIndex, data } = cenc.decode(cenc.json, reqRaw)
     const upload = activeUploads.get(uploadId)
-    if (!upload) return Buffer.from(JSON.stringify({ success: false, error: 'Invalid upload ID' }))
+    if (!upload) return cenc.encode(cenc.json, { success: false, error: 'Invalid upload ID' })
 
-    const chunk = Buffer.from(data, 'base64')
+    const chunk = Buffer.from(data)
     upload.writeStream.write(chunk)
     upload.receivedChunks++
+    upload.bytesReceived += chunk.length
 
     if (upload.receivedChunks === upload.totalChunks) {
+      const endTime = Date.now()
+      const timeTaken = (endTime - upload.startTime) / 1000
+      const fileSizeMB = upload.bytesReceived / (1024 * 1024)
+      const speedMBps = fileSizeMB / timeTaken
+
+      console.log(`\nUpload Statistics:
+    File Size: ${fileSizeMB.toFixed(2)} MB
+    Time Taken: ${timeTaken.toFixed(2)} seconds
+    Speed: ${speedMBps.toFixed(2)} MB/s`)
+
       upload.writeStream.end()
       activeUploads.delete(uploadId)
-      return Buffer.from(JSON.stringify({ success: true, completed: true }))
+      return cenc.encode(cenc.json, { success: true, completed: true })
     }
 
-    return Buffer.from(JSON.stringify({ success: true, completed: false }))
+    return cenc.encode(cenc.json, { success: true, completed: false })
   })
 }
 
