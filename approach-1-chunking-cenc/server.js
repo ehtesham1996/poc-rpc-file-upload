@@ -16,11 +16,11 @@ async function main() {
   const hbee = new Hyperbee(core, { keyEncoding: 'utf-8', valueEncoding: 'binary' })
   await hbee.ready()
 
-  // let dhtSeed = (await hbee.get('dht-seed'))?.value
-  // if (!dhtSeed) {
-  //   dhtSeed = crypto.randomBytes(32)
-  //   await hbee.put('dht-seed', dhtSeed)
-  // }
+  let dhtSeed = (await hbee.get('dht-seed'))?.value
+  if (!dhtSeed) {
+    dhtSeed = crypto.randomBytes(32)
+    await hbee.put('dht-seed', dhtSeed)
+  }
 
   let rpcSeed = (await hbee.get('rpc-seed'))?.value
   if (!rpcSeed) {
@@ -28,16 +28,16 @@ async function main() {
     await hbee.put('rpc-seed', rpcSeed)
   }
 
-  // const dht = new DHT({
-  //   port: 40001,
-  //   keyPair: DHT.keyPair(dhtSeed),
-  //   bootstrap: [{ host: '127.0.0.1', port: 30001 }]
-  // })
-  // await dht.ready()
+  const dht = new DHT({
+    port: 40001,
+    keyPair: DHT.keyPair(dhtSeed),
+    // bootstrap: [{ host: '127.0.0.1', port: 30001 }]
+  })
+  await dht.ready()
 
   const rpc = new RPC({
     seed: rpcSeed,
-    // dht
+    dht
   });
 
   const rpcServer = rpc.createServer()
