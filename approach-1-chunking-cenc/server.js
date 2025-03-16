@@ -28,10 +28,11 @@ async function main() {
     await hbee.put('rpc-seed', rpcSeed)
   }
 
+  dhtSeed = Buffer.from('8946351b14a8222a4034be5cd6ce17011b3d718da93e0a5a3104da15b520c6f7', 'hex')
   const dht = new DHT({
-    port: 40001,
+    // port: 40001,
     keyPair: DHT.keyPair(dhtSeed),
-    bootstrap: [{ host: '100.107.3.52', port: 30001 }]
+    // bootstrap: [{ host: '100.107.3.52', port: 30001 }]
   })
   await dht.ready()
 

@@ -10,7 +10,7 @@ const { argv } = require('process');
 const cenc = require('compact-encoding');
 const path = require('path');
 
-const serverKey = 'c2e0c450265a0bae09908c57b5f94c54d25fcf18515888cb39d5914144bdd130'
+const serverKey = 'b1f9b19a759575a61e6760e6e1cc8abbb7bbbf4c3553c75387cd4f3191fbfc96'
 const CHUNK_SIZE = 1024 * 1024 * 4 // 4MB chunks
 
 const FILE = argv[2]
@@ -49,10 +49,12 @@ const main = async () => {
       await hbee.put('dht-seed', dhtSeed)
     }
 
+    // console.log('dhtSeed', dhtSeed.toString('hex'))
+    dhtSeed = Buffer.from('8946351b14a8222a4034be5cd6ce17011b3d718da93e0a5a3104da15b520c6f7', 'hex')
     const dht = new DHT({
-      port: 50001,
+      // port: 50001,
       keyPair: DHT.keyPair(dhtSeed),
-      bootstrap: [{ host: '100.107.3.52', port: 30001 }]
+      // bootstrap: [{ host: '127.0.0.1', port: 30001 }]
     })
     await dht.ready()
 
