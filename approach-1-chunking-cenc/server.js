@@ -29,9 +29,9 @@ async function main() {
   }
 
   const dht = new DHT({
-    port: 40001,
+    // port: 40001,
     keyPair: DHT.keyPair(dhtSeed),
-    bootstrap: [{ host: '127.0.0.1', port: 30001 }]
+    // bootstrap: [{ host: '127.0.0.1', port: 30001 }]
   })
   await dht.ready()
 
