@@ -10,7 +10,7 @@ const { argv } = require('process');
 const cenc = require('compact-encoding');
 const path = require('path');
 
-const serverKey = 'b1f9b19a759575a61e6760e6e1cc8abbb7bbbf4c3553c75387cd4f3191fbfc96'
+const serverKey = 'b84c107e4cf8d34207faa2aad0d17938faa84e47d0a562417a927a4b852ce718'
 const CHUNK_SIZE = 1024 * 1024 * 4 // 4MB chunks
 
 const FILE = argv[2]

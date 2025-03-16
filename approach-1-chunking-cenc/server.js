@@ -43,6 +43,7 @@ async function main() {
 
   const rpcServer = rpc.createServer()
   await rpcServer.listen()
+  console.log('Server address is',rpcServer.address())
   console.log('rpc server started listening on public key:', rpcServer.publicKey.toString('hex'))
 
   goodBye(async () => {
