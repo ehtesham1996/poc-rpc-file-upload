@@ -19,12 +19,12 @@ async function main() {
   const hbee = new Hyperbee(core, { keyEncoding: 'utf-8', valueEncoding: 'binary' })
   await hbee.ready()
 
-  let dhtSeed = (await hbee.get('dht-seed'))?.value
-  if (!dhtSeed) {
-    // not found, generate and store in db
-    dhtSeed = crypto.randomBytes(32)
-    await hbee.put('dht-seed', dhtSeed)
-  }
+  // let dhtSeed = (await hbee.get('dht-seed'))?.value
+  // if (!dhtSeed) {
+  //   // not found, generate and store in db
+  //   dhtSeed = crypto.randomBytes(32)
+  //   await hbee.put('dht-seed', dhtSeed)
+  // }
 
   let rpcSeed = (await hbee.get('rpc-seed'))?.value
   if (!rpcSeed) {
@@ -32,23 +32,23 @@ async function main() {
     await hbee.put('rpc-seed', rpcSeed)
   }
 
-  const dht = new DHT({
-    port: 40001,
-    keyPair: DHT.keyPair(dhtSeed),
-    bootstrap: [{ host: '127.0.0.1', port: 30001 }] // note boostrap points to dht that is started via cli
-  })
-  await dht.ready()
+  // const dht = new DHT({
+  //   port: 40001,
+  //   keyPair: DHT.keyPair(dhtSeed),
+  //   bootstrap: [{ host: '127.0.0.1', port: 30001 }] // note boostrap points to dht that is started via cli
+  // })
+  // await dht.ready()
 
   const rpc = new RPC({
     seed: rpcSeed,
-    dht
+    // dht
   });
   const rpcServer = rpc.createServer()
   await rpcServer.listen()
   console.log('rpc server started listening on public key:', rpcServer.publicKey.toString('hex'))
 
   const swarm = new Hyperswarm({
-    dht
+    // dht
   })
   const drive = new Localdrive('./drives/approach-2')
 
@@ -58,7 +58,7 @@ async function main() {
       const token = crypto.randomBytes(32).toString('hex')
       
       const swarm = new Hyperswarm({
-        dht
+        // dht
       })
 
       let startTime, endTime
@@ -128,7 +128,7 @@ async function main() {
   goodBye(async () => {
     await rpcServer.close()
     await swarm.destroy()
-    await dht.destroy()
+    // await dht.destroy()
     await coreStore.close()
   })
 }

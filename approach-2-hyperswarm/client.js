@@ -30,22 +30,24 @@ const main = async () => {
     const hcore = coreStore.get({ name: 'approach-2' })
 
     const hbee = new Hyperbee(hcore, { keyEncoding: 'utf-8', valueEncoding: 'binary' })
-    let dhtSeed = (await hbee.get('dht-seed'))?.value
-    if (!dhtSeed) {
-      // not found, generate and store in db
-      dhtSeed = crypto.randomBytes(32)
-      await hbee.put('dht-seed', dhtSeed)
-    }
+    // let dhtSeed = (await hbee.get('dht-seed'))?.value
+    // if (!dhtSeed) {
+    //   // not found, generate and store in db
+    //   dhtSeed = crypto.randomBytes(32)
+    //   await hbee.put('dht-seed', dhtSeed)
+    // }
 
     // start distributed hash table, it is used for rpc service discovery
-    const dht = new DHT({
-      port: 50001,
-      keyPair: DHT.keyPair(dhtSeed),
-      bootstrap: [{ host: '127.0.0.1', port: 30001 }] // note boostrap points to dht that is started via cli
-    })
-    await dht.ready()
+    // const dht = new DHT({
+    //   port: 50001,
+    //   keyPair: DHT.keyPair(dhtSeed),
+    //   bootstrap: [{ host: '127.0.0.1', port: 30001 }] // note boostrap points to dht that is started via cli
+    // })
+    // await dht.ready()
 
-    const rpc = new RPC({ dht })
+    const rpc = new RPC({ 
+      // dht 
+    })
     const client = rpc.connect(Buffer.from(serverKey, 'hex'))
 
     // Request transfer token
@@ -59,7 +61,7 @@ const main = async () => {
 
     // Setup hyperswarm connection
     const swarm = new Hyperswarm({
-      dht
+      // dht
     })
     const fileStream = fs.createReadStream(FILE)
 

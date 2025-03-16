@@ -49,14 +49,14 @@ const main = async () => {
       await hbee.put('dht-seed', dhtSeed)
     }
 
-    const dht = new DHT({
-      port: 50001,
-      keyPair: DHT.keyPair(dhtSeed),
-      bootstrap: [{ host: '127.0.0.1', port: 30001 }]
-    })
-    await dht.ready()
+    // const dht = new DHT({
+    //   port: 50001,
+    //   keyPair: DHT.keyPair(dhtSeed),
+    //   bootstrap: [{ host: '127.0.0.1', port: 30001 }]
+    // })
+    // await dht.ready()
 
-    const rpc = new RPC({ dht })
+    const rpc = new RPC()
     const client = rpc.connect(Buffer.from(serverKey, 'hex'))
 
     const fileName = path.basename(FILE)
