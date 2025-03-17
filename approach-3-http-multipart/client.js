@@ -13,7 +13,7 @@ async function getFileSize(filePath) {
   return stats.size
 }
 
-const API_URL = 'http://100.66.3.25:3000/upload'
+const API_URL = 'http://100.66.3.25:4041/upload'
 
 async function main() {
   try {
