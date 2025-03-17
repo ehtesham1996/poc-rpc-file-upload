@@ -46,7 +46,8 @@ async function main() {
   console.log('rpc server started listening on public key:', rpcServer.publicKey.toString('hex'))
 
   const swarm = new Hyperswarm({
-    // dht
+    dht,
+    firewall: () => false
   })
   const drive = new Localdrive('./drives/approach-2')
 
