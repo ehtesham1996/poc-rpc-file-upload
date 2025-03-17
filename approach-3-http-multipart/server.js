@@ -41,7 +41,7 @@ fastify.post('/upload', async (request, reply) => {
 
   const endTime = Date.now()
   const timeTaken = (endTime - startTime) / 1000
-  const fileSizeMB = bytesUploaded / (1024 * 1024)
+  const fileSizeMB = (bytesUploaded / (1024 * 1024)) - 1
   const speedMBps = fileSizeMB / timeTaken
 
   console.log(`Upload Statistics:

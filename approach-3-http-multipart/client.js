@@ -19,7 +19,7 @@ async function main() {
   try {
     const fileName = path.basename(FILE)
     const fileSize = await getFileSize(FILE)
-    const fileSizeMB = fileSize / (1024 * 1024)
+    const fileSizeMB = (fileSize / (1024 * 1024)) - 1
     
     const form = new FormData()
     const fileStream = fs.createReadStream(FILE)
