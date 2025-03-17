@@ -9,6 +9,7 @@ const crypto = require('crypto')
 const DHT = require('hyperdht')
 const Hyperswarm = require('hyperswarm')
 const { argv } = require('process')
+const goodbye = require('graceful-goodbye')
 
 const serverKey = 'b910f71f0494fe037de5980889204501c020d65b6fdb7ad080410b036dd26631'
 
@@ -30,23 +31,22 @@ const main = async () => {
     const hcore = coreStore.get({ name: 'approach-2' })
 
     const hbee = new Hyperbee(hcore, { keyEncoding: 'utf-8', valueEncoding: 'binary' })
-    // let dhtSeed = (await hbee.get('dht-seed'))?.value
-    // if (!dhtSeed) {
-    //   // not found, generate and store in db
-    //   dhtSeed = crypto.randomBytes(32)
-    //   await hbee.put('dht-seed', dhtSeed)
-    // }
+    let dhtSeed = (await hbee.get('dht-seed'))?.value
+    if (!dhtSeed) {
+      // not found, generate and store in db
+      dhtSeed = crypto.randomBytes(32)
+      await hbee.put('dht-seed', dhtSeed)
+    }
 
     // start distributed hash table, it is used for rpc service discovery
-    // const dht = new DHT({
-    //   port: 50001,
-    //   keyPair: DHT.keyPair(dhtSeed),
-    //   bootstrap: [{ host: '127.0.0.1', port: 30001 }] // note boostrap points to dht that is started via cli
-    // })
-    // await dht.ready()
+    const dht = new DHT({
+      keyPair: DHT.keyPair(dhtSeed),
+    })
+    await dht.ready()
 
-    const rpc = new RPC({ 
-      // dht 
+    const rpc = new RPC({
+      dht,
+      firewall: () => false
     })
     const client = rpc.connect(Buffer.from(serverKey, 'hex'))
 
@@ -61,7 +61,8 @@ const main = async () => {
 
     // Setup hyperswarm connection
     const swarm = new Hyperswarm({
-      // dht
+      dht,
+      firewall: () => false
     })
     const fileStream = fs.createReadStream(FILE)
 
@@ -103,6 +104,13 @@ const main = async () => {
     await swarm.flush()
 
     await rpc.destroy()
+
+    goodbye(async () => {
+      await dht.destroy()
+      await coreStore.close()
+      await swarm.destroy()
+      await rpc.destroy()
+    })
   } catch (err) {
     console.error(err)
     process.exit(-1)
