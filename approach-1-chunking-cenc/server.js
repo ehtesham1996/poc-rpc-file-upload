@@ -88,7 +88,7 @@ async function main() {
     if (upload.receivedChunks === upload.totalChunks) {
       const endTime = Date.now()
       const timeTaken = (endTime - upload.startTime) / 1000
-      const fileSizeMB = upload.bytesReceived / (1024 * 1024)
+      const fileSizeMB = (upload.bytesReceived / (1024 * 1024)) - 1
       const speedMBps = fileSizeMB / timeTaken
 
       console.log(`\nUpload Statistics:

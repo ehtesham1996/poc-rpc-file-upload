@@ -66,7 +66,7 @@ const main = async () => {
 
     const fileName = path.basename(FILE)
     const fileSize = await getFileSize(FILE)
-    const fileSizeMB = fileSize / (1024 * 1024)
+    const fileSizeMB = (fileSize / (1024 * 1024)) - 1
     const totalChunks = Math.ceil(fileSize / CHUNK_SIZE)
     let bytesUploaded = 0
 
