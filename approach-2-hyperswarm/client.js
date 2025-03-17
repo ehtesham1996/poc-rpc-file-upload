@@ -71,8 +71,11 @@ const main = async () => {
       startTime = Date.now()
       console.log('\nconnected to server')
       const fileStream = fs.createReadStream(FILE)
+
+      // send verification token
       conn.write(Buffer.from(token, 'hex'))
 
+      // send the file
       fileStream.pipe(conn)
 
       fileStream.on('data', chunk => {
@@ -81,7 +84,6 @@ const main = async () => {
         const uploadedMB = (bytesUploaded / (1024 * 1024)).toFixed(2)
         process.stdout.write(`\rProgress: ${progress}% (${uploadedMB}MB/${fileSizeMB.toFixed(2)}MB)`)
       })
-      // Send token first
 
       // Then stream the file
       fileStream.once('end', () => {
