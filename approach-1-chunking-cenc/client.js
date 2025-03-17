@@ -50,7 +50,7 @@ const main = async () => {
     }
 
     // console.log('dhtSeed', dhtSeed.toString('hex'))
-    dhtSeed = Buffer.from('8946351b14a8222a4034be5cd6ce17011b3d718da93e0a5a3104da15b520c6f7', 'hex')
+    // dhtSeed = Buffer.from('8946351b14a8222a4034be5cd6ce17011b3d718da93e0a5a3104da15b520c6f7', 'hex')
     const dht = new DHT({
       // port: 50001,
       keyPair: DHT.keyPair(dhtSeed),
@@ -73,6 +73,9 @@ const main = async () => {
     const startTime = Date.now()
 
     // Initialize upload
+    const echoResponse = await client.request('echo', Buffer.from('Hello'))
+    console.log('Echo response:', echoResponse.toString())
+    
     const initRes = await client.request('initUpload', Buffer.from(JSON.stringify({
       path: '/mov.mov',
       totalChunks

@@ -28,7 +28,6 @@ async function main() {
     await hbee.put('rpc-seed', rpcSeed)
   }
 
-  dhtSeed = Buffer.from('8946351b14a8222a4034be5cd6ce17011b3d718da93e0a5a3104da15b520c6f7', 'hex')
   const dht = new DHT({
     // port: 40001,
     keyPair: DHT.keyPair(dhtSeed),
@@ -55,6 +54,8 @@ async function main() {
   const drive = new Localdrive('./drives/approach-1')
   const activeUploads = new Map()
 
+  rpcServer.respond('echo', async (x) => x)
+  
   rpcServer.respond('initUpload', async (reqRaw) => {
     const { path, totalChunks } = JSON.parse(reqRaw.toString())
     const uploadId = crypto.randomBytes(16).toString('hex')
