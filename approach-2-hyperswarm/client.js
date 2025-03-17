@@ -84,7 +84,7 @@ const main = async () => {
       fileStream.pipe(conn)
 
       fileStream.once('end', () => {
-        conn.end()
+        // conn.end()
         endTime = Date.now()
         const timeTaken = (endTime - startTime) / 1000
         const speedMBps = fileSizeMB / timeTaken
@@ -94,8 +94,8 @@ const main = async () => {
     Time Taken: ${timeTaken.toFixed(2)} seconds
     Average Speed: ${speedMBps.toFixed(2)} MB/s`)
 
-        swarm.leavePeer(Buffer.from(signedKey, 'hex'))
-        setTimeout(() => process.exit(0), 1000)
+        // swarm.leavePeer(Buffer.from(signedKey, 'hex'))
+        // setTimeout(() => process.exit(0), 1000)
       })
     })
 
