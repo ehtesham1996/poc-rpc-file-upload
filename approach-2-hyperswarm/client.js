@@ -79,12 +79,12 @@ const main = async () => {
       console.log('\nconnected to server')
       // Send token first
 
-      conn.write(Buffer.from(token, 'hex'))
+      // conn.write(Buffer.from(token, 'hex'))
       // Then stream the file
       fileStream.pipe(conn)
 
       fileStream.once('end', () => {
-        // conn.end()
+        conn.end()
         endTime = Date.now()
         const timeTaken = (endTime - startTime) / 1000
         const speedMBps = fileSizeMB / timeTaken
