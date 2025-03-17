@@ -25,12 +25,12 @@ async function main() {
     const fileStream = fs.createReadStream(FILE)
     let bytesUploaded = 0
 
-    fileStream.on('data', chunk => {
-      bytesUploaded += chunk.length
-      const progress = (bytesUploaded / fileSize * 100).toFixed(2)
-      const uploadedMB = (bytesUploaded / (1024 * 1024)).toFixed(2)
-      process.stdout.write(`\rProgress: ${progress}% (${uploadedMB}MB/${fileSizeMB.toFixed(2)}MB)`)
-    })
+    // fileStream.on('data', chunk => {
+    //   bytesUploaded += chunk.length
+    //   const progress = (bytesUploaded / fileSize * 100).toFixed(2)
+    //   const uploadedMB = (bytesUploaded / (1024 * 1024)).toFixed(2)
+    //   process.stdout.write(`\rProgress: ${progress}% (${uploadedMB}MB/${fileSizeMB.toFixed(2)}MB)`)
+    // })
 
     form.append('file', fileStream, { filename: fileName })
 
