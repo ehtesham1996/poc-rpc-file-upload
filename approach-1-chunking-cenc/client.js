@@ -9,6 +9,7 @@ const DHT = require('hyperdht')
 const { argv } = require('process');
 const cenc = require('compact-encoding');
 const path = require('path');
+const goodBye = require('graceful-goodbye')
 
 const serverKey = 'b84c107e4cf8d34207faa2aad0d17938faa84e47d0a562417a927a4b852ce718'
 const CHUNK_SIZE = 1024 * 1024 * 4 // 4MB chunks
@@ -69,6 +70,12 @@ const main = async () => {
     const totalChunks = Math.ceil(fileSize / CHUNK_SIZE)
     let bytesUploaded = 0
 
+    goodBye(async () => {
+      await rpc.destroy()
+      await dht.destroy()
+      await coreStore.close()
+    })
+
     console.log(`Starting upload of ${fileName} (${fileSizeMB.toFixed(2)} MB)`)
     const startTime = Date.now()
 
@@ -117,7 +124,6 @@ const main = async () => {
     await rpc.destroy()
     process.exit(0)
   } catch (err) {
-    await rpc.destroy()
     console.error(err)
     process.exit(-1)
   }
