@@ -43,14 +43,14 @@ async function main() {
   const rpcServer = rpc.createServer({
     firewall: () => false
   })
-  
+
   await rpcServer.listen()
   console.log('Server address is',rpcServer.address())
   console.log('rpc server started listening on public key:', rpcServer.publicKey.toString('hex'))
 
   goodBye(async () => {
     await rpcServer.close()
-    // await dht.destroy()
+    await dht.destroy()
     await coreStore.close()
   })
 

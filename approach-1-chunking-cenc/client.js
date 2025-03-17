@@ -117,6 +117,7 @@ const main = async () => {
     await rpc.destroy()
     process.exit(0)
   } catch (err) {
+    await rpc.destroy()
     console.error(err)
     process.exit(-1)
   }
