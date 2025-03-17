@@ -12,7 +12,7 @@ const path = require('path');
 const goodBye = require('graceful-goodbye')
 
 const serverKey = 'b84c107e4cf8d34207faa2aad0d17938faa84e47d0a562417a927a4b852ce718'
-const CHUNK_SIZE = 1024 * 1024 * 5 // 4MB chunks
+const CHUNK_SIZE = 1024 * 1024 * 4 // 4MB chunks
 
 const FILE = argv[2]
 
