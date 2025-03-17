@@ -21,7 +21,7 @@ const main = async () => {
     // Get file stats
     const stats = await fs.promises.stat(FILE)
     const fileSize = stats.size
-    const fileSizeMB = fileSize / (1024 * 1024)
+    const fileSizeMB = (fileSize / (1024 * 1024)) - 1
     let bytesUploaded = 0
 
     console.log(`Starting upload of ${FILE} (${fileSizeMB.toFixed(2)} MB)`)
