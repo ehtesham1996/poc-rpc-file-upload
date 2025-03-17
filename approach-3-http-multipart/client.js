@@ -13,7 +13,7 @@ async function getFileSize(filePath) {
   return stats.size
 }
 
-const API_URL = 'http://100.66.3.25:4041/upload'
+const API_URL = 'http://cosmic-staging-gpu-01.tail8a2a3f.ts.net:4041/upload'
 
 async function main() {
   try {
@@ -42,7 +42,7 @@ async function main() {
         ...form.getHeaders()
       },
       maxContentLength: Infinity,
-      maxBodyLength: Infinity
+      maxBodyLength: Infinity,
     })
 
     const result = res.data
