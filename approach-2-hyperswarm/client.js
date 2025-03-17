@@ -64,24 +64,25 @@ const main = async () => {
       dht,
       firewall: () => false
     })
-    const fileStream = fs.createReadStream(FILE)
 
-    fileStream.on('data', chunk => {
-      bytesUploaded += chunk.length
-      const progress = (bytesUploaded / fileSize * 100).toFixed(2)
-      const uploadedMB = (bytesUploaded / (1024 * 1024)).toFixed(2)
-      process.stdout.write(`\rProgress: ${progress}% (${uploadedMB}MB/${fileSizeMB.toFixed(2)}MB)`)
-    })
 
     let startTime, endTime
     swarm.on('connection', (conn) => {
       startTime = Date.now()
       console.log('\nconnected to server')
+      const fileStream = fs.createReadStream(FILE)
+      fileStream.pipe(conn)
+
+      fileStream.on('data', chunk => {
+        bytesUploaded += chunk.length
+        const progress = (bytesUploaded / fileSize * 100).toFixed(2)
+        const uploadedMB = (bytesUploaded / (1024 * 1024)).toFixed(2)
+        process.stdout.write(`\rProgress: ${progress}% (${uploadedMB}MB/${fileSizeMB.toFixed(2)}MB)`)
+      })
       // Send token first
 
       // conn.write(Buffer.from(token, 'hex'))
       // Then stream the file
-      fileStream.pipe(conn)
 
       fileStream.once('end', () => {
         conn.end()
