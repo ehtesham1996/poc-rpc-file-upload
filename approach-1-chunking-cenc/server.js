@@ -37,10 +37,13 @@ async function main() {
 
   const rpc = new RPC({
     seed: rpcSeed,
-    dht
+    dht,
   });
 
-  const rpcServer = rpc.createServer()
+  const rpcServer = rpc.createServer({
+    firewall: () => false
+  })
+  
   await rpcServer.listen()
   console.log('Server address is',rpcServer.address())
   console.log('rpc server started listening on public key:', rpcServer.publicKey.toString('hex'))
@@ -55,7 +58,7 @@ async function main() {
   const activeUploads = new Map()
 
   rpcServer.respond('echo', async (x) => x)
-  
+
   rpcServer.respond('initUpload', async (reqRaw) => {
     const { path, totalChunks } = JSON.parse(reqRaw.toString())
     const uploadId = crypto.randomBytes(16).toString('hex')

@@ -75,7 +75,7 @@ const main = async () => {
     // Initialize upload
     const echoResponse = await client.request('echo', Buffer.from('Hello'))
     console.log('Echo response:', echoResponse.toString())
-    
+
     const initRes = await client.request('initUpload', Buffer.from(JSON.stringify({
       path: '/mov.mov',
       totalChunks
