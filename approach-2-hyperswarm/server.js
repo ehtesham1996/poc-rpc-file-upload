@@ -62,12 +62,10 @@ async function main() {
       })
 
       let startTime, endTime
-      const signedKey = swarm.keyPair.publicKey.toString('hex')
-
       swarm.on('connection', (conn, info) => {
         conn.once('data', async (data) => {
-          // const token = data.toString('hex')
-          const transfer = pendingTransfers.get(signedKey)
+          const token = data.toString('hex')
+          const transfer = pendingTransfers.get(token)
           
           if (!transfer) {
             console.error('transfer not found')
@@ -99,7 +97,7 @@ async function main() {
     Speed: ${speedMBps.toFixed(2)} MB/s`)
 
             console.log('transfer ended')
-            pendingTransfers.delete(signedKey)
+            pendingTransfers.delete(token)
           })
 
           conn.on('error', (_err) => {
@@ -111,7 +109,7 @@ async function main() {
       swarm.listen()
       await swarm.flush()
 
-      pendingTransfers.set(signedKey, {
+      pendingTransfers.set(token, {
         path: req.path,
         timestamp: Date.now(),
         swarm,

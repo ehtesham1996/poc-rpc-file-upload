@@ -71,6 +71,8 @@ const main = async () => {
       startTime = Date.now()
       console.log('\nconnected to server')
       const fileStream = fs.createReadStream(FILE)
+      conn.write(Buffer.from(token, 'hex'))
+
       fileStream.pipe(conn)
 
       fileStream.on('data', chunk => {
@@ -81,9 +83,7 @@ const main = async () => {
       })
       // Send token first
 
-      // conn.write(Buffer.from(token, 'hex'))
       // Then stream the file
-
       fileStream.once('end', () => {
         conn.end()
         endTime = Date.now()
@@ -95,8 +95,8 @@ const main = async () => {
     Time Taken: ${timeTaken.toFixed(2)} seconds
     Average Speed: ${speedMBps.toFixed(2)} MB/s`)
 
-        // swarm.leavePeer(Buffer.from(signedKey, 'hex'))
-        // setTimeout(() => process.exit(0), 1000)
+        swarm.leavePeer(Buffer.from(signedKey, 'hex'))
+        setTimeout(() => process.exit(0), 1000)
       })
     })
 
