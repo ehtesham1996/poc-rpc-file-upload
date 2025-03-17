@@ -100,6 +100,7 @@ async function main() {
           })
 
           conn.on('error', (_err) => {
+            console.error('error', _err)
             conn.end()
           })
         })
