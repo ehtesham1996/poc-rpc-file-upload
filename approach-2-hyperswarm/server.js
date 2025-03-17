@@ -69,6 +69,7 @@ async function main() {
           const transfer = pendingTransfers.get(token)
           
           if (!transfer) {
+            console.error('transfer not found')
             conn.end()
             return
           }
