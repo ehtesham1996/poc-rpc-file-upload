@@ -11,7 +11,7 @@ const Hyperswarm = require('hyperswarm')
 const { argv } = require('process')
 const goodbye = require('graceful-goodbye')
 
-const serverKey = 'b910f71f0494fe037de5980889204501c020d65b6fdb7ad080410b036dd26631'
+const serverKey = '3b517400a37bcabffcda86f40e8468021e23b6aa4023a697572691eec82c5cd4'
 
 const main = async () => {
   try {
