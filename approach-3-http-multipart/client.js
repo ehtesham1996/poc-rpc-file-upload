@@ -13,6 +13,8 @@ async function getFileSize(filePath) {
   return stats.size
 }
 
+const API_URL = 'http://100.66.3.25:3000/upload'
+
 async function main() {
   try {
     const fileName = path.basename(FILE)
@@ -35,7 +37,7 @@ async function main() {
     const startTime = Date.now()
     console.log(`Starting upload of ${fileName} (${fileSizeMB.toFixed(2)} MB)`)
 
-    const res = await axios.post('http://localhost:3000/upload', form, {
+    const res = await axios.post(API_URL, form, {
       headers: {
         ...form.getHeaders()
       },
