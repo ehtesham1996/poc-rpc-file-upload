@@ -103,8 +103,6 @@ const main = async () => {
     swarm.joinPeer(Buffer.from(signedKey, 'hex'))
     await swarm.flush()
 
-    await rpc.destroy()
-
     goodbye(async () => {
       await dht.destroy()
       await coreStore.close()
